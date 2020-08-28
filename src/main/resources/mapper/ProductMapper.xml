@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zp.food_market.mapper.ProductMapper">
+
+    <select id="selectAllProduct" resultType="map">
+        select product.*,photo_url
+        from product,photo
+        where product.photo_number = photo.photo_number and photo.photo_remark='index'
+        order by product_id desc
+    </select>
+
+    <select id="selectProductByCategory" resultType="map">
+        select product.*,photo_url
+        from product,photo
+        where category_id = #{categoryId} and product.photo_number = photo.photo_number and photo.photo_remark='index'
+        order by product_id desc
+    </select>
+
+    <select id="selectProductByName" resultType="map">
+        select product.*,photo_url
+        from product,photo
+        where product_title like '%${productTitle}%' and product.photo_number = photo.photo_number and photo.photo_remark='index'
+        order by product_id desc
+    </select>
+
+
+    <insert id="insertProduct" parameterType="map">
+        insert into product(product_title,product_old_price,product_new_price,product_sell_month_count,product_sell_total_count,product_total_count,category_id,photo_number)
+        values(#{productTitle},#{productOldPrice},#{productNewPrice},#{productSellMonthCount},#{productSellTotalCount},#{productTotalCount},#{categoyId},#{photoNumber})
+    </insert>
+
+    <insert id="insertPhoto" parameterType="map">
+        insert into photo(photo_number,photo_url,photo_remark)
+        values(#{photoNumber},#{photoUrl},#{photoRemark})
+    </insert>
+
+    <update id="updateProduct" parameterType="map">
+        update product
+        <trim prefix="set" suffixOverrides=",">
+            <if test="productTitle != null and productTitle != ''">product_title = #{productTitle},</if>
+            <if test="productOldPrice != null and productOldPrice != ''">product_old_price = #{productOldPrice},</if>
+            <if test="productNewPrice != null and productNewPrice != ''">product_new_price = #{productNewPrice},</if>
+            <if test="productTotalCount != null and productTotalCount != ''">product_total_count = #{productTotalCount},</if>
+            <if test="categoryId != null and categoryId != ''">category_id = #{categoryId},</if>
+        </trim>
+        where product_id = #{productId}
+    </update>
+
+
+    <update id="updatePhoto" parameterType="map">
+        update photo
+        <trim prefix="set" suffixOverrides=",">
+            <if test="photoUrl != null and photoUrl != ''">photo_url = #{photoUrl},</if>
+            <if test="photoRemark != null and photoRemark != ''">photo_remark = #{photoRemark},</if>
+        </trim>
+        where photo_number = #{photoNumber1}
+    </update>
+
+    <select id="selectPhotoNumberById" resultType="String">
+        select photo_number as phoneNumber from product where product_id = #{productId}
+    </select>
+
+    <delete id="deleteProduct" parameterType="java.util.List">
+        delete from  product where product_id in
+        <foreach collection="list"  open="(" close=")" separator=","  item="item" >
+            #{item}
+        </foreach>
+    </delete>
+
+    <sql id="queryFields">
+select  product_id as productId,
+		product_title as productTitle,
+		product_old_price as productOldPrice,
+		product_new_price as productNewPrice,
+		product_sell_month_count as productSellMonthCount,
+		product_sell_total_count as productSellTotalCount,
+		product_total_count as productTotalCount,
+		category_id as categoryId
+ from product
+  </sql>
+
+    <sql id="queryCondition">
+        <trim prefix="where" prefixOverrides="and|or">
+            <if test="productId            != null and productId              !=''">and product_id    		                 =#{productId}</if>
+            <if test="productTitle          != null and productTitle            !=''">and product_title     		             like '%${productTitle}%'</if>
+            <if test="categoryId      != null and categoryId        !=''">and category_id    		         = #{categoryId}</if>
+        </trim>
+    </sql>
+
+    <select id="selectUserManageCount" parameterType="hashmap" resultType="int">
+        select count(*)
+        from product
+        <include refid="queryCondition" />
+    </select>
+
+    <select id="selectUserManageList" parameterType="hashmap" resultType="hashmap">
+        <include refid="queryFields" />
+        <include refid="queryCondition" />
+        order by product_id DESC
+        <if test="start != null and pageSize != null ">
+            limit #{start}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="selectCategory" resultType="map">
+        select category_id as categoryId,category_name as categoryName from category
+    </select>
+
+    <select id="selectProductById" resultType="map">
+        select  product_id as productId,
+		product_title as productTitle,
+		product_old_price as productOldPrice,
+		product_new_price as productNewPrice,
+		product_sell_month_count as productSellMonthCount,
+		product_sell_total_count as productSellTotalCount,
+		product_total_count as productTotalCount,
+		category_id as categoryId,
+		photo_url as photoUrl
+        from product,photo
+        where product.photo_number = photo.photo_number and photo.photo_remark='index' and product_id=#{productId}
+    </select>
+
+    <select id="selectActiveProduct" resultType="map" parameterType="map">
+        select product_id as productId,
+		product_title as productTitle,
+		product_old_price as productOldPrice,
+		product_new_price as productNewPrice,
+		product_sell_month_count as productSellMonthCount,
+		product_sell_total_count as productSellTotalCount,
+		product_total_count as productTotalCount,
+		category_id as categoryId,
+		photo_url as photoUrl
+		from product,photo
+        where product.photo_number = photo.photo_number and photo.photo_remark='index' and product_old_price!=product_new_price
+        order by product_id DESC
+        limit 5
+    </select>
+
+    <select id="selectHotProduct" resultType="map">
+        select product_id as productId,
+		product_title as productTitle,
+		product_old_price as productOldPrice,
+		product_new_price as productNewPrice,
+		product_sell_month_count as productSellMonthCount,
+		product_sell_total_count as productSellTotalCount,
+		product_total_count as productTotalCount,
+		category_id as categoryId,
+		photo_url as photoUrl
+		from product,photo
+        where product.photo_number = photo.photo_number and photo.photo_remark='index'
+        order by product_total_count DESC
+        limit 5
+    </select>
+
+    <select id="selectNewProduct" resultType="map">
+        select product_id as productId,
+		product_title as productTitle,
+		product_old_price as productOldPrice,
+		product_new_price as productNewPrice,
+		product_sell_month_count as productSellMonthCount,
+		product_sell_total_count as productSellTotalCount,
+		product_total_count as productTotalCount,
+		category_id as categoryId,
+		photo_url as photoUrl
+		from product,photo
+        where product.photo_number = photo.photo_number and photo.photo_remark='index'
+        order by product_id DESC
+        limit 5
+    </select>
+
+
+</mapper>

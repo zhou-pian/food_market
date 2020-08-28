@@ -1,0 +1,44 @@
+#spring:
+#  datasource:
+#    username: root
+#    password: 200079
+#    url: jdbc:mysql://localhost:3308/oa?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
+#    driver-class-name: com.mysql.jdbc.Driver
+#    type: com.alibaba.druid.pool.DruidDataSource
+
+#自定义数据源
+#jdbc:
+#  username: root
+#  password: 200079
+#  url: jdbc:mysql://localhost:3308/springdemo?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
+#  driverClassName: com.mysql.jdbc.Driver
+
+#设置mybatis的mapper文件
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+
+spring:
+  datasource:
+      username: root
+      password: 200079
+      url: jdbc:mysql://localhost:3308/foodiemarket?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
+      driver-class-name: com.mysql.jdbc.Driver
+
+  freemarker:
+    allow-request-override: false
+    allow-session-override: false
+    cache: false
+    charset: utf-8
+    check-template-location: true
+    content-type: text/html
+    enabled: true
+    expose-request-attributes: false
+    expose-session-attributes: false
+    expose-spring-macro-helpers: true
+    prefer-file-system-access: true
+    suffix: .ftl
+    template-loader-path: classpath:/templates/
+    settings:
+      classic_compatible: true
+      default_encoding: UTF-8
+      template_update_delay: 0

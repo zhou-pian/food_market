@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zp.food_market.mapper.UserMapper">
+
+    <select id="findByNameandPasswd" resultType="map">
+        select * from user where user_name=#{name} and user_password=#{passwd}
+    </select>
+
+    <select id="findByName" resultType="map">
+        select * from user where user_name=#{userName}
+    </select>
+
+    <insert id="insertUser" parameterType="map">
+        insert into user(user_name,user_password,user_reg_time,user_phone,user_address)
+        values(#{userName},#{userPassword},SYSDATE(),#{userPhone},#{userAddress})
+    </insert>
+
+    <update id="updatePasswd" parameterType="map">
+        update user set user_password=#{userPassword} where user_name = #{userName}
+    </update>
+
+    <select id="selectListByUserId" resultType="map">
+        select shopping_list_id as shoppingListId, user_id as userId,shopping_list.product_id as productId,quantity,
+        product_title as productTitle,product_new_price as productNewPrice,photo_url as photoUrl,quantity*product_new_price as total
+        from shopping_list,product,photo
+        where user_id = #{userId} and shopping_list.product_id=product.product_id and product.photo_number = photo.photo_number and photo.photo_remark='index'
+        order by shopping_list_id desc
+    </select>
+
+    <select id="selectListByProductAndUse" resultType="map">
+        select * from shopping_list where user_id = #{userId} and product_id = #{productId}
+    </select>
+
+    <insert id="insertShoppingList" parameterType="map">
+        insert into shopping_list(user_id,product_id,quantity)
+        values(#{userId},#{productId},#{quantity})
+    </insert>
+
+    <select id="shoppingListCount" resultType="int">
+        select count(*) from shopping_list where user_id = #{userId}
+    </select>
+
+    <update id="setQuantity1">
+        update shopping_list
+        set quantity = quantity+1
+        where shopping_list_id = #{shoppingListId}
+    </update>
+
+    <update id="setQuantity2">
+        update shopping_list
+        set quantity = quantity-1
+        where shopping_list_id = #{shoppingListId}
+    </update>
+
+    <update id="setQuantity3">
+        update shopping_list
+        set quantity = quantity+#{quantity}
+        where shopping_list_id = #{shoppingListId}
+    </update>
+
+    <delete id="deleteShoppingList" parameterType="java.util.List">
+        delete from  shopping_list where shopping_list_id in
+        <foreach collection="list"  open="(" close=")" separator=","  item="item" >
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="selectProductByShoppingListId" resultType="Integer">
+        select product_id as productId from shopping_list where shopping_list_id = #{shoppingListId}
+    </select>
+
+    <select id="selectQuantityByShoppingListId" resultType="Integer">
+        select quantity from shopping_list where shopping_list_id = #{shoppingListId}
+    </select>
+</mapper>
